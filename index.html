@@ -287,18 +287,25 @@
   <div class="container">
     <h1>車輛維修報價系統</h1>
 
+    <!-- 3大分類分頁標籤 -->
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('exterior-repair', this)">外觀維修</button>
       <button class="tab-btn" onclick="switchTab('core-repair', this)">核心零件維修</button>
+      <button class="tab-btn" onclick="switchTab('maintenance', this)">保養項目</button>
     </div>
 
+    <!-- 備註說明區塊 -->
     <div id="note-exterior-repair" class="category-note">⚠️ 外觀維修分類選購時，總合將自動加上 $500 施工工本費</div>
     <div id="note-core-repair" class="category-note" style="display:none;">📌 核心零件維修分類（無額外工本費）</div>
+    <div id="note-maintenance" class="category-note" style="display:none;">📌 保養項目分類（無額外工本費）</div>
 
+    <!-- 內容區域 -->
     <div id="exterior-repair" class="tab-content active"></div>
     <div id="core-repair" class="tab-content"></div>
+    <div id="maintenance" class="tab-content"></div>
   </div>
 
+  <!-- 底部懸浮總金額列 -->
   <div class="summary-bar">
     <div class="summary-container">
       <div class="total-price">
@@ -313,7 +320,7 @@
   </div>
 
   <script>
-    // 精簡後的兩大分類與指定品項資料
+    // 包含三個分類的品項資料
     const itemsData = [
       // 1. 外觀維修 (含 500 工本費邏輯)
       { id: 'ext_hood', category: 'exterior-repair', name: '引擎蓋', price: 700 },
@@ -328,7 +335,22 @@
       { id: 'core_radiator', category: 'core-repair', name: '水箱', price: 650 },
       { id: 'core_brake', category: 'core-repair', name: '煞車系統', price: 600 },
       { id: 'core_generator', category: 'core-repair', name: '發電機', price: 1000 },
-      { id: 'core_gearbox', category: 'core-repair', name: '變速箱', price: 1800 }
+      { id: 'core_gearbox', category: 'core-repair', name: '變速箱', price: 1800 },
+
+      // 3. 保養項目 (新新增)
+      { id: 'maint_belt', category: 'maintenance', name: '傳動皮帶', price: 300 },
+      { id: 'maint_power_oil', category: 'maintenance', name: '方向機油', price: 150 },
+      { id: 'maint_oil_filter', category: 'maintenance', name: '機油濾清器', price: 350 },
+      { id: 'maint_coolant', category: 'maintenance', name: '水箱冷卻液', price: 100 },
+      { id: 'maint_spark_plug', category: 'maintenance', name: '火星塞', price: 500 },
+      { id: 'maint_brake_pad', category: 'maintenance', name: '煞車來令片', price: 200 },
+      { id: 'maint_brake_oil', category: 'maintenance', name: '煞車油', price: 100 },
+      { id: 'maint_fuel_filter', category: 'maintenance', name: '燃油濾芯', price: 350 },
+      { id: 'maint_air_filter', category: 'maintenance', name: '空氣濾清器', price: 250 },
+      { id: 'maint_gear_oil', category: 'maintenance', name: '變速箱油', price: 200 },
+      { id: 'maint_tire', category: 'maintenance', name: '輪胎', price: 200 },
+      { id: 'maint_battery_coolant', category: 'maintenance', name: '電池冷卻液', price: 100 },
+      { id: 'maint_hv_cable', category: 'maintenance', name: '高壓電束', price: 500 }
     ];
 
     const itemCounts = {};
@@ -444,7 +466,7 @@
         return;
       }
 
-      let text = "🛠️ 【車輛維修報價明細】\n";
+      let text = "🛠️ 【車輛維修與保養報價明細】\n";
       text += "-------------------------\n";
       text += "📦 選購品項：\n" + selectedItems.join("\n") + "\n\n";
 
