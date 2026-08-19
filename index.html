@@ -32,7 +32,7 @@
       color: var(--text-main);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
       padding: 20px;
-      padding-bottom: 140px; /* 增加底部留白以適應放大的結算列 */
+      padding-bottom: 140px;
     }
 
     .container {
@@ -98,7 +98,7 @@
       gap: 18px;
     }
 
-    /* 零件卡片 */
+    /* 零件卡片 (維持舊版精緻外框與間距) */
     .card {
       background: var(--card-bg);
       border: 1px solid var(--brass-border);
@@ -135,7 +135,28 @@
       font-size: 1rem;
     }
 
-    /* 加減數量計數器 */
+    /* 性能改裝下拉選單 */
+    .level-select-container {
+      margin-bottom: 10px;
+    }
+
+    .level-select-container select {
+      width: 100%;
+      background: rgba(10, 9, 8, 0.8);
+      border: 1px solid var(--brass-border);
+      color: var(--text-main);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .level-select-container select:focus {
+      outline: none;
+      border-color: var(--brass-primary);
+    }
+
+    /* 加減數量計數器 (完全恢復舊版樣式) */
     .counter {
       display: flex;
       align-items: center;
@@ -226,7 +247,7 @@
     }
 
     .total-price span.price-num {
-      color: #e09238; /* 橘褐色 */
+      color: #e09238;
       font-size: 2.6rem;
       font-weight: 800;
       margin-left: 8px;
@@ -287,22 +308,25 @@
   <div class="container">
     <h1>車輛維修報價系統</h1>
 
-    <!-- 3大分類分頁標籤 -->
+    <!-- 4大分類分頁標籤 -->
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('exterior-repair', this)">外觀維修</button>
       <button class="tab-btn" onclick="switchTab('core-repair', this)">核心零件維修</button>
       <button class="tab-btn" onclick="switchTab('maintenance', this)">保養項目</button>
+      <button class="tab-btn" onclick="switchTab('perf-tuning', this)">性能改裝</button>
     </div>
 
     <!-- 備註說明區塊 -->
     <div id="note-exterior-repair" class="category-note">⚠️ 外觀維修分類選購時，總合將自動加上 $500 施工工本費</div>
     <div id="note-core-repair" class="category-note" style="display:none;">📌 核心零件維修分類（無額外工本費）</div>
     <div id="note-maintenance" class="category-note" style="display:none;">📌 保養項目分類（無額外工本費）</div>
+    <div id="note-perf-tuning" class="category-note" style="display:none;">📌 性能改裝分類（直接選擇對應等級即列入試算）</div>
 
     <!-- 內容區域 -->
     <div id="exterior-repair" class="tab-content active"></div>
     <div id="core-repair" class="tab-content"></div>
     <div id="maintenance" class="tab-content"></div>
+    <div id="perf-tuning" class="tab-content"></div>
   </div>
 
   <!-- 底部懸浮總金額列 -->
@@ -320,7 +344,6 @@
   </div>
 
   <script>
-    // 包含三個分類的品項資料
     const itemsData = [
       // 1. 外觀維修 (含 500 工本費邏輯)
       { id: 'ext_hood', category: 'exterior-repair', name: '引擎蓋', price: 700 },
@@ -337,7 +360,7 @@
       { id: 'core_generator', category: 'core-repair', name: '發電機', price: 1000 },
       { id: 'core_gearbox', category: 'core-repair', name: '變速箱', price: 1800 },
 
-      // 3. 保養項目 (新新增)
+      // 3. 保養項目
       { id: 'maint_belt', category: 'maintenance', name: '傳動皮帶', price: 300 },
       { id: 'maint_power_oil', category: 'maintenance', name: '方向機油', price: 150 },
       { id: 'maint_oil_filter', category: 'maintenance', name: '機油濾清器', price: 350 },
@@ -350,41 +373,142 @@
       { id: 'maint_gear_oil', category: 'maintenance', name: '變速箱油', price: 200 },
       { id: 'maint_tire', category: 'maintenance', name: '輪胎', price: 200 },
       { id: 'maint_battery_coolant', category: 'maintenance', name: '電池冷卻液', price: 100 },
-      { id: 'maint_hv_cable', category: 'maintenance', name: '高壓電束', price: 500 }
+      { id: 'maint_hv_cable', category: 'maintenance', name: '高壓電束', price: 500 },
+
+      // 4. 性能改裝 (多等級選項，單選模式)
+      { 
+        id: 'perf_engine', category: 'perf-tuning', name: '引擎', isLevelSelect: true,
+        levels: [
+          { name: '未選擇', price: 0 },
+          { name: '原廠', price: 7500 },
+          { name: 'LV1', price: 10000 },
+          { name: 'LV2', price: 12500 },
+          { name: 'LV3', price: 15000 },
+          { name: 'LV4', price: 18750 }
+        ]
+      },
+      { 
+        id: 'perf_suspension', category: 'perf-tuning', name: '懸吊', isLevelSelect: true,
+        levels: [
+          { name: '未選擇', price: 0 },
+          { name: '原廠懸吊', price: 3125 },
+          { name: '降低懸吊', price: 4375 },
+          { name: '街頭懸吊', price: 5625 },
+          { name: '運動懸吊', price: 6875 },
+          { name: '競技懸吊', price: 8125 }
+        ]
+      },
+      { 
+        id: 'perf_turbo', category: 'perf-tuning', name: '渦輪', isLevelSelect: true,
+        levels: [
+          { name: '未選擇', price: 0 },
+          { name: '原廠渦輪', price: 3125 },
+          { name: '升級渦輪', price: 10625 }
+        ]
+      },
+      { 
+        id: 'perf_brake', category: 'perf-tuning', name: '煞車', isLevelSelect: true,
+        levels: [
+          { name: '未選擇', price: 0 },
+          { name: '原廠煞車', price: 4375 },
+          { name: '街頭煞車', price: 5625 },
+          { name: '運動煞車', price: 6875 },
+          { name: '競技煞車', price: 8125 }
+        ]
+      },
+      { 
+        id: 'perf_armor', category: 'perf-tuning', name: '裝甲', isLevelSelect: true,
+        levels: [
+          { name: '未選擇', price: 0 },
+          { name: '原廠裝甲', price: 12500 },
+          { name: '20%裝甲', price: 15625 },
+          { name: '40%裝甲', price: 21875 },
+          { name: '60%裝甲', price: 28125 },
+          { name: '80%裝甲', price: 34375 },
+          { name: '100%裝甲', price: 40625 }
+        ]
+      },
+      { 
+        id: 'perf_gearbox', category: 'perf-tuning', name: '變速箱', isLevelSelect: true,
+        levels: [
+          { name: '未選擇', price: 0 },
+          { name: '原廠變速箱', price: 5625 },
+          { name: '街頭變速箱', price: 7500 },
+          { name: '運動變速箱', price: 9375 },
+          { name: '競技變速箱', price: 11250 }
+        ]
+      }
     ];
 
     const itemCounts = {};
+    const itemLevelIndex = {};
 
     function renderItems() {
       itemsData.forEach(item => {
         itemCounts[item.id] = 0;
+        itemLevelIndex[item.id] = 0;
+
         const container = document.getElementById(item.category);
         if (!container) return;
 
         const card = document.createElement('div');
         card.className = 'card';
-        card.innerHTML = `
-          <div>
-            <div class="card-header">
-              <span class="card-title">${item.name}</span>
-              <span class="card-price">$${item.price.toLocaleString()}</span>
-            </div>
-          </div>
-          
-          <div>
-            <div class="counter">
-              <button onclick="updateCount('${item.id}', -1)">-</button>
-              <span id="count-${item.id}">0</span>
-              <button onclick="updateCount('${item.id}', 1)">+</button>
-            </div>
 
-            <div id="subtotal-${item.id}" class="card-subtotal">
-              <div class="subtotal-price" id="subtotal-price-${item.id}">小計：$0</div>
+        if (item.isLevelSelect) {
+          let optionsHtml = item.levels.map((lvl, idx) => {
+            let priceStr = lvl.price > 0 ? ` ($${lvl.price.toLocaleString()})` : '';
+            return `<option value="${idx}">${lvl.name}${priceStr}</option>`;
+          }).join('');
+
+          card.innerHTML = `
+            <div>
+              <div class="card-header" style="margin-bottom: 12px;">
+                <span class="card-title">${item.name}</span>
+                <span class="card-price" id="price-display-${item.id}">$0</span>
+              </div>
+              <div class="level-select-container">
+                <select id="level-${item.id}" onchange="updatePerfLevel('${item.id}')">
+                  ${optionsHtml}
+                </select>
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        } else {
+          card.innerHTML = `
+            <div>
+              <div class="card-header">
+                <span class="card-title">${item.name}</span>
+                <span class="card-price">$${item.price.toLocaleString()}</span>
+              </div>
+            </div>
+            
+            <div>
+              <div class="counter">
+                <button onclick="updateCount('${item.id}', -1)">-</button>
+                <span id="count-${item.id}">0</span>
+                <button onclick="updateCount('${item.id}', 1)">+</button>
+              </div>
+
+              <div id="subtotal-${item.id}" class="card-subtotal">
+                <div class="subtotal-price" id="subtotal-price-${item.id}">小計：$0</div>
+              </div>
+            </div>
+          `;
+        }
         container.appendChild(card);
       });
+    }
+
+    function updatePerfLevel(id) {
+      const selectElem = document.getElementById(`level-${id}`);
+      const lvlIdx = parseInt(selectElem.value);
+      itemLevelIndex[id] = lvlIdx;
+
+      const item = itemsData.find(i => i.id === id);
+      const selectedLvl = item.levels[lvlIdx];
+
+      document.getElementById(`price-display-${id}`).innerText = selectedLvl.price > 0 ? `$${selectedLvl.price.toLocaleString()}` : '$0';
+      calculateSummary();
     }
 
     function switchTab(tabId, btnElem) {
@@ -427,11 +551,19 @@
       let hasExteriorRepair = false;
 
       itemsData.forEach(item => {
-        const count = itemCounts[item.id] || 0;
-        if (count > 0) {
-          totalCost += count * item.price;
-          if (item.category === 'exterior-repair') {
-            hasExteriorRepair = true;
+        if (item.isLevelSelect) {
+          const lvlIdx = itemLevelIndex[item.id] || 0;
+          const selectedLvl = item.levels[lvlIdx];
+          if (selectedLvl.price > 0) {
+            totalCost += selectedLvl.price;
+          }
+        } else {
+          const count = itemCounts[item.id] || 0;
+          if (count > 0) {
+            totalCost += count * item.price;
+            if (item.category === 'exterior-repair') {
+              hasExteriorRepair = true;
+            }
           }
         }
       });
@@ -452,12 +584,21 @@
       let hasExteriorRepair = false;
 
       itemsData.forEach(item => {
-        const count = itemCounts[item.id] || 0;
-        if (count > 0) {
-          const itemCost = count * item.price;
-          totalCost += itemCost;
-          if (item.category === 'exterior-repair') hasExteriorRepair = true;
-          selectedItems.push(`• ${item.name} x${count} ($${itemCost.toLocaleString()})`);
+        if (item.isLevelSelect) {
+          const lvlIdx = itemLevelIndex[item.id] || 0;
+          const selectedLvl = item.levels[lvlIdx];
+          if (selectedLvl.price > 0) {
+            totalCost += selectedLvl.price;
+            selectedItems.push(`• ${item.name}：${selectedLvl.name} ($${selectedLvl.price.toLocaleString()})`);
+          }
+        } else {
+          const count = itemCounts[item.id] || 0;
+          if (count > 0) {
+            const itemCost = count * item.price;
+            totalCost += itemCost;
+            if (item.category === 'exterior-repair') hasExteriorRepair = true;
+            selectedItems.push(`• ${item.name} x${count} ($${itemCost.toLocaleString()})`);
+          }
         }
       });
 
@@ -466,7 +607,7 @@
         return;
       }
 
-      let text = "🛠️ 【車輛維修與保養報價明細】\n";
+      let text = "🛠️ 【車輛維修、保養與改裝報價明細】\n";
       text += "-------------------------\n";
       text += "📦 選購品項：\n" + selectedItems.join("\n") + "\n\n";
 
@@ -492,6 +633,17 @@
         if (countElem) countElem.innerText = '0';
         updateCardSubtotal(id);
       });
+
+      itemsData.forEach(item => {
+        if (item.isLevelSelect) {
+          itemLevelIndex[item.id] = 0;
+          const selectElem = document.getElementById(`level-${item.id}`);
+          if (selectElem) selectElem.value = 0;
+          const priceDisplay = document.getElementById(`price-display-${item.id}`);
+          if (priceDisplay) priceDisplay.innerText = '$0';
+        }
+      });
+
       calculateSummary();
     }
 
