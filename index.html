@@ -6,12 +6,11 @@
   <title>車輛維修報價系統</title>
   <style>
     :root {
-      /* 低飽和黃銅橘 + 暗黑金屬色調 */
       --bg-dark: #0f0e0d;
       --card-bg: rgba(24, 22, 20, 0.92);
-      --brass-primary: #c88a38;   /* 低飽和黃銅橘 */
-      --brass-light: #e0b168;     /* 淺黃銅色 */
-      --brass-dark: #7a511e;      /* 深黃銅色 */
+      --brass-primary: #c88a38;
+      --brass-light: #e0b168;
+      --brass-dark: #7a511e;
       --brass-border: rgba(200, 138, 56, 0.35);
       --text-main: #e6e4e0;
       --text-muted: #9e9a93;
@@ -48,7 +47,6 @@
       text-shadow: 0 0 10px rgba(200, 138, 56, 0.2);
     }
 
-    /* 分頁標籤 */
     .tabs {
       display: flex;
       gap: 8px;
@@ -75,7 +73,6 @@
       box-shadow: 0 0 12px rgba(200, 138, 56, 0.35);
     }
 
-    /* 類別備註標示 */
     .category-note {
       text-align: center;
       color: var(--brass-primary);
@@ -87,7 +84,6 @@
       border: 1px dashed var(--brass-border);
     }
 
-    /* 內容區域 */
     .tab-content {
       display: none;
     }
@@ -98,7 +94,6 @@
       gap: 18px;
     }
 
-    /* 零件卡片 (維持舊版精緻外框與間距) */
     .card {
       background: var(--card-bg);
       border: 1px solid var(--brass-border);
@@ -135,7 +130,6 @@
       font-size: 1rem;
     }
 
-    /* 性能改裝下拉選單 */
     .level-select-container {
       margin-bottom: 10px;
     }
@@ -156,7 +150,6 @@
       border-color: var(--brass-primary);
     }
 
-    /* 加減數量計數器 (完全恢復舊版樣式) */
     .counter {
       display: flex;
       align-items: center;
@@ -191,7 +184,6 @@
       font-size: 1.05rem;
     }
 
-    /* 卡片內小計區塊 */
     .card-subtotal {
       background: rgba(200, 138, 56, 0.08);
       border: 1px solid rgba(200, 138, 56, 0.25);
@@ -211,7 +203,6 @@
       font-weight: bold;
     }
 
-    /* 底部懸浮結算列 (特大面板) */
     .summary-bar {
       position: fixed;
       bottom: 0;
@@ -235,7 +226,6 @@
       gap: 15px;
     }
 
-    /* 總金額特大字體 + 橘褐色 */
     .total-price {
       font-size: 1.5rem;
       color: var(--brass-light);
@@ -261,7 +251,6 @@
       font-weight: normal;
     }
 
-    /* 按鈕組 */
     .action-btns {
       display: flex;
       gap: 10px;
@@ -308,7 +297,6 @@
   <div class="container">
     <h1>車輛維修報價系統</h1>
 
-    <!-- 4大分類分頁標籤 -->
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('exterior-repair', this)">外觀維修</button>
       <button class="tab-btn" onclick="switchTab('core-repair', this)">核心零件維修</button>
@@ -316,20 +304,17 @@
       <button class="tab-btn" onclick="switchTab('perf-tuning', this)">性能改裝</button>
     </div>
 
-    <!-- 備註說明區塊 -->
     <div id="note-exterior-repair" class="category-note">⚠️ 外觀維修分類選購時，總合將自動加上 $500 施工工本費</div>
     <div id="note-core-repair" class="category-note" style="display:none;">📌 核心零件維修分類（無額外工本費）</div>
     <div id="note-maintenance" class="category-note" style="display:none;">📌 保養項目分類（無額外工本費）</div>
     <div id="note-perf-tuning" class="category-note" style="display:none;">📌 性能改裝分類（直接選擇對應等級即列入試算）</div>
 
-    <!-- 內容區域 -->
     <div id="exterior-repair" class="tab-content active"></div>
     <div id="core-repair" class="tab-content"></div>
     <div id="maintenance" class="tab-content"></div>
     <div id="perf-tuning" class="tab-content"></div>
   </div>
 
-  <!-- 底部懸浮總金額列 -->
   <div class="summary-bar">
     <div class="summary-container">
       <div class="total-price">
@@ -345,14 +330,12 @@
 
   <script>
     const itemsData = [
-      // 1. 外觀維修 (含 500 工本費邏輯)
       { id: 'ext_hood', category: 'exterior-repair', name: '引擎蓋', price: 700 },
       { id: 'ext_trunk', category: 'exterior-repair', name: '後車箱', price: 500 },
       { id: 'ext_window', category: 'exterior-repair', name: '車窗', price: 150 },
       { id: 'ext_tire', category: 'exterior-repair', name: '車輪胎', price: 500 },
       { id: 'ext_door', category: 'exterior-repair', name: '車門', price: 350 },
 
-      // 2. 核心零件維修
       { id: 'core_steering', category: 'core-repair', name: '動力方向盤幫浦', price: 1000 },
       { id: 'core_injector', category: 'core-repair', name: '噴油嘴', price: 1000 },
       { id: 'core_radiator', category: 'core-repair', name: '水箱', price: 650 },
@@ -360,7 +343,6 @@
       { id: 'core_generator', category: 'core-repair', name: '發電機', price: 1000 },
       { id: 'core_gearbox', category: 'core-repair', name: '變速箱', price: 1800 },
 
-      // 3. 保養項目
       { id: 'maint_belt', category: 'maintenance', name: '傳動皮帶', price: 300 },
       { id: 'maint_power_oil', category: 'maintenance', name: '方向機油', price: 150 },
       { id: 'maint_oil_filter', category: 'maintenance', name: '機油濾清器', price: 350 },
@@ -375,7 +357,6 @@
       { id: 'maint_battery_coolant', category: 'maintenance', name: '電池冷卻液', price: 100 },
       { id: 'maint_hv_cable', category: 'maintenance', name: '高壓電束', price: 500 },
 
-      // 4. 性能改裝 (多等級選項，單選模式)
       { 
         id: 'perf_engine', category: 'perf-tuning', name: '引擎', isLevelSelect: true,
         levels: [
@@ -554,7 +535,7 @@
         if (item.isLevelSelect) {
           const lvlIdx = itemLevelIndex[item.id] || 0;
           const selectedLvl = item.levels[lvlIdx];
-          if (selectedLvl.price > 0) {
+          if (selectedLvl && selectedLvl.price > 0) {
             totalCost += selectedLvl.price;
           }
         } else {
@@ -587,7 +568,7 @@
         if (item.isLevelSelect) {
           const lvlIdx = itemLevelIndex[item.id] || 0;
           const selectedLvl = item.levels[lvlIdx];
-          if (selectedLvl.price > 0) {
+          if (selectedLvl && selectedLvl.price > 0) {
             totalCost += selectedLvl.price;
             selectedItems.push(`• ${item.name}：${selectedLvl.name} ($${selectedLvl.price.toLocaleString()})`);
           }
@@ -627,27 +608,10 @@
     }
 
     function resetAll() {
-      Object.keys(itemCounts).forEach(id => {
-        itemCounts[id] = 0;
-        const countElem = document.getElementById(`count-${id}`);
-        if (countElem) countElem.innerText = '0';
-        updateCardSubtotal(id);
-      });
-
-      itemsData.forEach(item => {
-        if (item.isLevelSelect) {
-          itemLevelIndex[item.id] = 0;
-          const selectElem = document.getElementById(`level-${item.id}`);
-          if (selectElem) selectElem.value = 0;
-          const priceDisplay = document.getElementById(`price-display-${item.id}`);
-          if (priceDisplay) priceDisplay.innerText = '$0';
-        }
-      });
-
-      calculateSummary();
+      // 點擊清單時直接重新載入頁面，達到如同 Ctrl + F5 的完全重置效果
+      location.reload();
     }
 
-    // 初始化渲染
     renderItems();
   </script>
 </body>
